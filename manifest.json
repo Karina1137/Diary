@@ -6,8 +6,8 @@
     "background_color":"#ffffff",
     "theme_color":"#4A90E2",
     "icons":[{
-        "src":"https://www.themorgan.org/sites/default/files/exhibitions/hawthorne-sophia.jpg",
+        "src":"app照片.png",
         "sizes":"512x512",
-        "type":"image/jpeg"
+        "type":"image/png"
     }]
 }
