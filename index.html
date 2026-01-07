@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>個人空間介面</title>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
-    <style>
+   <link rel="manifest" href="manifest.json">
+   <style>
         body{
             margin: 0;             /*margin的作用是跟別的文字的距離*/
             font-family: 'Baloo 2',cursive;
@@ -218,9 +219,17 @@
         localStorage.setItem("lang",currentLang)
     });
     
-    
+    if ('serviceWorker' in navigator){ //mean查看电脑是否知道什么叫serviceWorker
+        window.addEventListener('load', function(){  //作用是等到整个网页都开始run了才开始执行
+            navigator.serviceWorker.register('sw.js').then(function(reg){   //去浏览器把sw.js的档案下载；后面then的作用则是讲serviceWorker register的东西塞进reg中
+                console.log('成功注册Servive Worker!',reg.scope);  //如果注册成功则在控制台留下一句话
+            }).catch(function(err){  //如果发生意外，假设不能运行，要告诉为什么失败
+                console.log('注册失败:',err);
+            });
+        });
+        }
 
-        
+        //假设电脑知道什么叫service worker(并非所有的浏览器都支援PWA功能),假设支援，则注册并启动此档案，这时候浏览器会去github伺服器下载sw.js此档案
     
     </script>
 
