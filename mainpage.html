@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">               <!--這個是讓html知道這個頁面最主要的語言-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主頁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
+    <style>
+        body{
+            margin:0;
+            font-family: "Baloo 2",cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg,#ffecdf 0%,#fcb69f 100%);
+        }
+        .calender{
+            background: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 20px;                           /*讓邊角變圓*/
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);       /*在元素周圍加上陰影，使得有立體感，語法是這樣的box-shadow:x位移 Y位移 模糊程度 顏色rbga()*/
+            width: 700px;
+            height: 450px;
+        }
+        .calender-header{
+            text-align:center;                    /*設定文字的水平對齊方向(左，中，右三種)*/
+            font-size: 1.8em;
+            color: #ff6f61;
+            margin-bottom: 10px;
+            user-select: none;                      /*即不可被使用者選取*/
+        }
+
+
+        /*以下的css是使得元素可以從左排到右的關鍵，他改變了預設的從上到下，改成網格式的排版*/
+        .calender-grid{
+            display: grid;                                 /*CSS中的Grid Layout系統，就像類似表格的網格排版*/
+            grid-template-columns: repeat(7,1fr);           /*這個是設定網格要幾欄，每欄多寬,語法是repeat(幾欄，多寬)*/
+            gap: 5px;                                       /*格子之間的間距*/
+        }
+        .day-header{
+            text-align: center;
+            font-weight: bold;
+            color: #444;
+            user-select: none;
+        }
+        .day{
+            background-color: white;
+            border-radius: 10px;
+            padding:10px;
+            text-align: center;
+            cursor:pointer;
+            transition: 0.3s;                               /*讓某些css屬性的變化過渡完成，而不是瞬間完成*/
+            box-shadow:0 2px 5px rgba(0,0,0,0.05);
+            user-select:none;
+        }
+        .day:hover{
+            background: #ffede6;
+            transform: scale(1.05);           /*這個是縮放的意思，即不同過改變元素本身的寬高，所以不會使得元素的位置亂掉*/
+        }
+        .empty{
+            background: transparent;          /*這個是透明的意思*/
+            box-shadow:none;
+            cursor:default
+
+        }
+        .btn-group{
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-group button{
+            padding: 8px 15px;
+            background:linear-gradient(135deg,#ff9a9e,#ff6f61);
+            color: white;
+            border:none;                /*這個是指邊框的線條*/
+            border-radius: 10px;        /*指圓滑程度*/
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            user-select:none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-group button:hover{
+            transform: scale(1.05);
+            background: linear-gradient(135degg,#ffb6b9,#ff867c);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="calender">
+        <div class="btn-group">
+            <button id="prev-month">‹ 上一個月</button>
+            <button id="next-month">下一個月 ›</button>
+        </div>
+        <div  id='calender-header'class="calender-header">2025年8月</div>
+        <div class="calender-grid" id='calender-grid'>            <!--grid是指網格，方格等，就是指日曆的形狀-->
+        <!--星期幾標題-->
+        <div class="day-header">日</div>
+        <div class="day-header">一</div>  
+        <div class="day-header">二</div>  
+        <div class="day-header">三</div>  
+        <div class="day-header">四</div>  
+        <div class="day-header">五</div>  
+        <div class="day-header">六</div>   
+        </div>   
+    </div>
+
+    <script>
+        let currentYear = 2025;
+        let currentMonth = 7; // 0-based (7 = 8月)
+
+        const header = document.getElementById("calender-header");
+        const grid = document.getElementById("calender-grid");
+
+        function renderCalender(year,month) {                    //用function(把這個函式保存在記憶體中，隨時可callout),不能用let           //renderCalender的意思是把日曆渲染(畫)出來
+            //上面的year,month是我們設定的變數，下面會有用currentYear(is defined)，currentMonth(is defined)來賦值
+            // 更新標題
+            header.textContent = `${year}年${month + 1}月`;
+
+            // 清除舊的日期格子（保留星期標題前 7 格）
+            while (grid.children.length > 7) {
+                grid.removeChild(grid.lastChild);
+            }
+
+            // 計算這個月的第一天星期幾
+            const firstDay = new Date(year, month, 1).getDay();
+
+            // 計算這個月有幾天
+            const daysInMonth = new Date(year, month + 1, 0).getDate();          //8月0號則代表7月的最後一天
+
+            // 填空白格子，所以我們日期跟禮拜幾才可以對上，因為這是決定我們到底要空多少格子
+            for (let i = 0; i < firstDay; i++) {     
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('empty');
+                grid.appendChild(emptyCell);
+            }
+
+            // 填日期格子
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.classList.add('day');
+                cell.textContent = day;
+                cell.addEventListener('click', function() {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    localStorage.setItem('selectedDate',dateStr);               //存日期到LocalStorage
+                    window.location.href = `Diary.html`;
+                });
+                grid.appendChild(cell);
+                //原本在script中添加的div是只存在在記憶體中的，他們並沒有放進html的結構中，所以不會出現在瀏覽器內，appendChild的作用就是把這個出生的元素搬進去htmml某個父容器中
+            }
+        }
+
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentMonth--;                           //點擊prev-month時currentMonth-1
+            if (currentMonth < 0) {                   //額外設定，當currentMonth小過0(即-1)
+                currentMonth = 11;                     //即設定成Month=11(11代表12月)
+                currentYear--;                         //然後年份-1
+            }
+            renderCalender(currentYear, currentMonth);
+        });
+
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {            //即12月
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalender(currentYear, currentMonth);
+        });
+
+        // 初始化
+        renderCalender(currentYear, currentMonth);           //這個是說一開始進入頁面的時候要先顯示的初始內容
+    </script>
+</body>
+</html>

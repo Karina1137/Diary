@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人空間介面</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
+    <style>
+        body{
+            margin: 0;             /*margin的作用是跟別的文字的距離*/
+            font-family: 'Baloo 2',cursive;
+            display:flex;          /*這個決定的是元素在頁面上怎麼被呈現,有幾種呈現方式，i.e. block inline等*/
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg,#ffecdf 0%,#fcb69f 100%);
+            overflow:hidden;               /*這個是控制說元素超出邊界要怎麼處理，hidden就是直接裁掉多餘的內容,要的話可以可以用scroll or auto，就會出現捲軸*/
+        }
+       
+        /*可愛的雲朵背景*/
+        .cloud{                       /*在這邊'.'是選擇class而不是id*/
+            position: absolute;
+            background-image: ("https://www.google.com/url?sa=i&url=https%3A%2F%2F616pic.com%2Fsucai%2Fvrgfxyrw1.html&psig=AOvVaw3FucA5_ZEmuQomVNheqZFY&ust=1755009899703000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJjMi8H_go8DFQAAAAAdAAAAABAL");
+            background:white;
+            border-radius: 50%;
+            opacity:0.8;
+            animation: float 8s infinite ease-in-out;
+        }
+        .cloud.small{width: 60px;height: 110px;top: 20%;left: 10%;animation-delay: 0s;}
+        .cloud.medium{width: 100px;height: 150px;top: 50%;left: 70%;animation-delay:2s;}
+        .cloud.large{width: 150px;height: 200px;top: 70%;left: 30%;animation-delay: 4s;}
+        
+        @keyframes float{
+            0%,100%{transform: translateY(o);}
+            50%{transform: translateY(-20px);}           /*translateY的意思是在垂直方向(Y軸）移動元素，正的則是向下移動，負的則是向上移動*/
+        }
+
+        /*登入系統*/
+        #loginForm{                          /*"#"是選擇id*/
+            background:rgba(255,255,255,0.85;)
+            padding: 40px;                                /* 元素「內容」和「邊框」之間的內距，簡單來說就是控制高度*/
+            width:350px;
+            border-radius:20px;                           /*  控制邊框的圓角程度*/
+            box-shadow:0 10px 20px rgba(0,0,0,0.1);
+            text-align:center;
+            animation:fadeIn 1.5s ease-out;
+            z-index: 1;                               /* 控制元素在「堆疊順序」上的高低*/
+        }
+
+        @keyframes fadeIn{
+            from{opacity:0;transform: scale(0.8);}             /*transform的作用是對元素本身做視覺變形，scale則是指縮放大小的意思*/
+            to{opacity: 1;transform: scale(1);}
+        }
+
+        h1{
+            margin-bottom: 20px;            /*元素和「外面其他東西」之間的外距*/
+            color:#ff6f61;
+            font-size:2em;
+        }
+        
+        label{
+            /* display: block; */
+            margin-top: 0px;
+            color: #444;
+        }
+
+        input{               /*是指同時修改input跟select這兩個元素*/
+            width: 80%;
+            padding: 8px;
+            margin-top: 0x;
+            border-radius: 10px;
+            border: 2px solid #ffd6d6;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;       /*這個box指的是input那個collum的box,他這個是限制這個格子在border的大小裡面*/
+        }
+
+        select{              
+            width: 20%;
+            padding: 8px;
+            margin-top: 0x;
+            border-radius: 10px;
+            border: 2px solid #ffd6d6;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;      
+        }
+
+        input:focus,select:focus{
+            border-color: #4faecb;
+        }
+
+        .btn{
+            margin-top: 15px;
+            padding:10px;
+            background: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size:1.1em;
+            transition: 0.3s;
+        }
+
+        .btn:hover{
+            background: #ff867c;
+            transform: scale(1.05);
+        }
+
+
+    </style>
+</head>
+<body>
+    <!--雲朵-->
+    <!-- <div class="cloud small"></div>                       class是可以多個元素一起使用，而同個id只有一個元素可以使用 -->
+    <!-- <div class="cloud medium"></div> -->
+    <!-- <div class="cloud large"></div> -->
+
+    <!--登入卡片-->
+    <form  id="loginForm" ,action="#" ,method="post">
+          
+        <h1><strong>個人平台登入</strong></h1><br>
+        <label for="language">語言</label><br>
+        <select name="language" id="language">
+            <option value="CN">中文</option>
+            <option value="ENG">ENG</option>
+        </select><br>   
+        <label for="name"><strong>用戶名稱</strong></label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="password"><strong>密碼</strong></label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="登入"><br>
+        <button class="btn" type="button" id="resetPasswordBtn">重設密碼</button>
+
+    </form> 
+    <script>
+        const form=document.getElementById("loginForm")
+    // addEventListener的意思是叫“事件監聽器”，即監視事件的發生，例如手機指紋，指紋正確則登入頁面，指紋的判斷就是由事件監視器來執行的
+        form.addEventListener("submit",function(e){
+            e.preventDefault();//原本的表單預設是進入server之類的，but我們沒有server所以會顯示錯誤，所以這邊是阻止原本的送出表單的預設行為
+        const name=document.getElementById("name").value.trim();//value就是用來取得表單輸入框等的內容，然後後面trim的作用就是把字串之間的空白刪掉
+        const password=document.getElementById('password').value;
+
+        if(!name){                //這個的意思是指說當你沒輸入名字時，就會跳出視窗提醒你
+            alert("請輸入名稱");
+            return;
+        }
+        if(!password){
+            alert("請輸入密碼");
+            return; }
+        //檢查LocalStorage裡面有沒有儲存過帳密
+        const savedName=localStorage.getItem("username");        //getItem是從localstorage拿資料，跟getElement不同，get element是從HTML裡面拿資料
+        const savedPassword=localStorage.getItem("password")
+
+        if(!savedName || !savedPassword){   //這個的意思是if Name跟Passsword皆為空白的話，則視為第一次使用
+            //第一次使用，儲存帳密
+            localStorage.setItem("username",name)                //setItem是預設好的API，作用是把資訊儲存到LocalStorage
+            localStorage.setItem("password",password)
+            alert(`帳號已建立！${name}`);
+        }else{
+            //假設不符合if的條件，則執行else,這個部分是說"已註冊過，對比帳密”
+            if(name===savedName && password===savedPassword){
+                //window.location.href的作用是跳轉html，即達到換頁面的效果，
+                // 後面的encodeURL等等的就是讓我們的username可以以URL的形式繼承到下一個網頁，不然的話system沒有辦法解讀我們的string
+                window.location.href=`welcome.html?user=${encodeURIComponent(name)}`;
+            }else{
+                alert("帳號或密碼錯誤")
+            }
+        }
+    });
+    </script>
+    <script>
+        const resetBtn= document.getElementById("resetPasswordBtn");
+        resetBtn.addEventListener("click",function(){
+            const newPassword=prompt("請輸入新密碼：");          //prompt的作用是跳出一個視窗讓你填入資訊，alert則只是跳出一個視窗
+            if(newPassword===null){
+                //按了取消，不做事
+                return;
+            }
+            if(newPassword.trim()===" "){
+                alert("密碼不能為空!")
+                return;
+            }
+            //更新localStorge
+            localStorage.setItem("password",newPassword);
+            alert("密碼已成功重設!");
+        });
+    
+    const translations={                                   //translations只是我們設定的一個代碼，而不是script中內設的API語言
+        CN:{
+            title:"個人平台登入",                           //注意在script中應該是用逗號(',')而不是分號(';')
+            username:'用戶名稱',                            //title,username等都是我們在translation中設定的key(類似代號)
+            password:'密碼',
+            login:'登入',
+            reset:"重設密碼"
+        },
+        
+        ENG:{
+            title:"Personal Platform Login",
+            username:'Username',
+            password:'Password',
+            login:'Login',
+            reset:'Forgot Password?'
+        }
+    };
+
+    document.getElementById('language').addEventListener("change",function(){
+        const lang=this.value;                          //因為select中有很多option(即當成value)，所以我們用this.value則可以固定我們的option
+        //因為我們設lang是this.value，所以會有CN跟ENG的兩種選擇，然後再按照上面的translition，就會自動對應中英兩個版本
+        //解析，querySelector的功能是在HTML中找到符合條件選擇器的第一個元素，例如h1 strong則是在h1中找到的第一個strong的元素
+        document.querySelector('h1 strong').textContent=translations[lang].title;
+        document.querySelector("label[for='name'] strong").textContent=translations[lang].username;
+        document.querySelector("label[for='password'] strong").textContent=translations[lang].password;
+        document.querySelector("input[type='submit']").value=translations[lang].login;
+        document.querySelector('#resetPasswordBtn').textContent=translations[lang].reset;
+        const currentLang=document.getElementById('language').value;
+        localStorage.setItem("lang",currentLang)
+    });
+    
+    
+
+        
+    
+    </script>
+
+</body>
+</html>

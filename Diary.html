@@ -1,0 +1,672 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
+    <title>Diary</title>
+    <style>
+        body{
+            font-family: 'Baloo 2',cursive;
+            transition: background 0.5s;
+            padding: 20px;
+            background:linear-gradient(135deg,#ffecdf 0%, #fcb69f 100%);
+            color: #333;
+            max-width: 800px;
+            margin:0 auto;
+            /* overflow: hidden;    隱藏溢出的內容，保持頁面整潔 */
+            /* height: 100vh;       讓body佔滿視窗高度 */
+            display:flex;
+            flex-direction: column;   /*垂直排列內容，可理解為決定軸線方向*/
+            justify-content: flex-start;    /*從頂部開始排列*/
+            align-items: center;      /*水平居中*/
+        }
+
+        #username{
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ff6f61;         /*使用主題色*/
+        } 
+
+        #date-display{
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .section{
+            margin-top: 30px;
+            padding: 20px;
+            background:rgba(255,255, 255,0.85);
+            border-radius: 20px;     /*更大圓角*/
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);  /*陰影*/
+            width: 100%;         /*滿寬，但受到body max-width的限制*/
+            max-width: 600px;      /*限制寬度，避免過寬*/
+            text-align: center;
+            animation: fadeIn 1.5s ease-out;    /*加入淡化動畫*/       
+        }
+
+
+        @keyframes fadeIn{
+            from{opacity: 0;transform: scale(0.8);}
+            to{opacity: 1;transform: scale(1);}
+        }
+
+
+        /*下面這行是兩個campur的，一個是weatherSection,一個是mooodSection*/
+        /*下面什麼div:first-child的意思是在這個元素中的第一個子元素，而且是div*/
+        #weatherSection>div:first-child, #moodSection >div:first-child,#expenseSection>div:first-child{
+            font-size:1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #ff6f61;
+        }
+
+
+        /*備註：color是影響元素的文字，background-color是專門控制背景顏色，background則可以做很東西，但是假如給他一個顏色，則有控制背景顏色的作用*/
+
+        nav a{
+            text-decoration: none;         /*這是把超鏈接的底線去掉*/
+            color: #ff6f61;
+            border: 2px solid #ffd6d6;
+            background:#fff;
+            font-weight: bold;          /*使得文字的粗細等於bold的粗細*/
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: 0.3s;
+
+        }
+
+        #diary-header{
+            margin-top: 30px;
+            padding: 20px;
+            background:rgba(255,255, 255,0.85);
+            border-radius: 20px;     /*更大圓角*/
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);  /*陰影*/
+            width: 100%;         /*滿寬，但受到body max-width的限制*/
+            max-width: 600px;      /*限制寬度，避免過寬*/
+            text-align: center;
+            animation: fadeIn 1.5s ease-out;    /*加入淡化動畫*/ 
+        }
+
+
+        nav a:hover{
+            background: #ffd6d6;
+            transform: scale(1.05);
+        }
+
+        .options{
+             display: flex;
+             justify-content: center;
+             gap: 10px;
+        }
+
+        .options button{    
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid #ffd6d6;
+            background:#fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+            min-width: 60px;        /*不管屏幕怎麼變，最小的寬度是60px*/
+            color: #444;
+        }   
+
+        .options button.selected{                 /*這群do*/
+            font-weight: bold;
+            border-color: #ff6f61;
+            background:#ffd6d6;
+            color:#ff6f61
+        }
+        
+
+        .options button:hover{
+            background:#ffebe9;
+            transform: scale(1.05);       
+        }
+
+        #expenseSection{
+            margin-top: 20px;
+        }
+
+        .expense-category{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            justify-content: center;        /*居中對齊輸入框*/
+            flex-wrap: wrap;                /*允許換行，適應小熒幕*/
+        }
+
+        .expense-category input{
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ffd6d6;      /*匹配邊框色*/
+            border-radius: 10px;
+            margin-left: 5px;
+            outline: none;           /*這個outline的意思是當我們點擊輸入框的時候，外框顏色會變化，這邊是把變化取消掉*/
+            transition: 0.3s;
+        }
+
+        .expense-category input:focus{
+            border-color:#ff6f61;     /*聚焦時主題色*/
+        }
+
+        .todo-item.completed .todo-text,.todo-item.completed .todo-time{
+            text-decoration:line-through;          /*這個的意思是為文字裝飾，這個是加上一條線*/
+            color:gray;
+        }
+
+        .todo-header{
+            display: flex;
+            justify-content: space-between;  /*左右分開*/
+            align-items: center;
+            margin-bottom: 10px;
+            color:#ff6f61;         /*標題主題色*/
+        }
+
+        .todo-header h2{
+            margin: 0;
+        }
+
+        #add-todo{
+            padding: 10px 20px;
+            background: #ff6f61;
+            color: white;
+            border:none;
+            border-radius:10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+
+        #add-todo:hover{
+            background:#ff867c;
+            transform: scale(1.05);
+        }
+
+        #add-todo:hover{
+            background: #ff867c;
+            transform: scale(1.05);
+        }   
+        
+        /*心得區設計*/
+        .todo-exp{ 
+        max-width:640px;
+        margin-top: 20px;
+        font-family: 'Baloo 2',cursive;
+        line-height: 1.6;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-exp h2{
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: #ff6f61;
+        }
+
+        .todo-exp label{
+            display:block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+
+        /*編號span的設計*/
+        .todo-exp span{
+            display: inline-block;          /*讓元素水平排列，但又能像方塊一樣設置寬高和編距*/
+            width: 28px;
+            text-align: right;
+            margin-right: 10px;            /*設置元素的外邊距*/
+            font-weight: 600;              /*設定字體的粗細*/
+            color: #666;
+            user-select: none;
+        }
+
+        /*把input的外框移除，改成底線樣式*/
+        .todo-exp input[type='text']{
+            width: calc(100%-48px);      /*扣掉編號寬度與間距，確保換行時不會超出*/
+            /*100%是取決於父元素的指定大小，父元素指的是div之類的，就是從外面包住input的元素*/
+            border:none;
+            border-bottom: 2px solid #ffd6d6;   /*底線*/
+            padding: 6px 4px;             /*設定內邊距，即框與邊框之間的空間*/
+            background-color: transparent;
+            font-size: 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            /*過渡效果*/
+            outline: none;     /*去除藍色外框*/
+        }   
+
+        /*聚焦時底線顏色加深並有輕微陰影提示*/
+        .todo-exp input[type="text"]:focus{         /*這個是針對聚焦時進行的設計*/
+            border-bottom-color: #ff6f61;
+            box-shadow: 0 2px 0 rgba(255, 111, 97, 0.07);
+        }
+
+        .todo-exp label{
+            display: block;
+            margin-top:12px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+
+        /*這個是設定手機的部分*/
+        @media(max-width:480px){         /*這個的意思是當屏幕小於等於480時*/
+            .todo-exp span {width:22px;margin-right:8px;}
+            .todo-exp input[type="text"]{width:calc(100%-36px);font-size: 15px;}
+        }
+
+    </style>
+</head>
+<body>
+    <div id="diary-header">
+    <div id="username">name</div>
+    <div id="date-display"></div>
+    <nav>
+        <a href="#expenseSection">開銷</a>
+        <a href="#todo-header">代辦事項</a>
+        <a href="#todo-exp">心得</a>
+    </nav>
+</div>
+    
+    <div class="section" id="weatherSection">
+        <div>天氣</div>
+       <div class="options">
+            <button data-weather="晴">晴</button>         <!--‘data-’的這種表達式算是在html中儲存額外隱藏資料，後面可以讓JS讀取這個資料-->
+            <button data-weather="雨">雨</button>
+            <button data-weather="雲">雲</button>
+            <button data-weather="雪">雪</button>
+        </div>
+    </div>
+
+    <div class="section" id="moodSection">
+        <div>心情</div>
+        <div class="options">
+            <button data-mood="佳">佳</button>
+            <button data-mood="普通">普通</button>
+            <button data-mood="糟">糟</button>
+        </div>
+    </div>
+
+    
+
+        <div class="section" id="expenseSection">
+            <div>今日開銷</div>
+            <div class="expense-category">
+                🍽️食物：
+                <input type="number" class="expense_food" placeholder='0'>         <!--placeholder是顯示的初始值-->
+                <input type="number" class="expense_food" placeholder='0'>
+                <input type="number" class="expense_food" placeholder='0'>
+                <input type="number" class="expense_food" placeholder='0'>
+                <span class="total_food">總和：</span>
+            </div>
+              <div class="expense-category">
+                🧑‍🎓學習：
+                <input type="number" class="expense_study" placeholder='0'>
+                <input type="number" class="expense_study" placeholder='0'>
+                <input type="number" class="expense_study" placeholder='0'>
+                <input type="number" class="expense_study" placeholder='0'>
+                <span class="total_study">總和：</span>
+            </div>
+              <div class="expense-category">
+                🛒日常：
+                <input type="number" class="expense_daily" placeholder='0'>
+                <input type="number" class="expense_daily" placeholder='0'>
+                <input type="number" class="expense_daily" placeholder='0'>
+                <input type="number" class="expense_daily" placeholder='0'>
+                <span class="total_daily">總和：</span>
+            </div>
+            <div class="expense-category">
+                🎮娛樂：
+                <input type="number" class="expense_entertainment" placeholder='0'>
+                <input type="number" class="expense_entertainment" placeholder='0'>
+                <input type="number" class="expense_entertainment" placeholder='0'>
+                <input type="number" class="expense_entertainment" placeholder='0'>
+                <span class="total_entertainment">總和：</span>
+            </div>
+
+            <div class="expense-category">
+                💰今日總開銷<span id="total_all">0</span>
+            </div>
+         </div>
+
+
+        <div id="todo-header">
+            <h2>待辦事項</h2>
+            <button id="add-todo">➕添加</button>
+        </div>
+        <div id="todo-list">
+        <!--將新增的todo會插在這裡-->
+        </div>
+       
+    
+    
+    
+    <script>
+        const selectedDate=localStorage.getItem('selectedDate')||"未選擇日期";
+        document.getElementById('date-display').textContent=`日期:${selectedDate}`;
+
+        //天氣按鈕互動
+        document.querySelectorAll('#weatherSection .options button').forEach(btn1=>{                         //querySelector可以抓到符合條件的第一個元素(不限id or class),querySelectorAll則可以選取全部符合條件的element
+            //後面的forEach是指對所有選取的元素都進行以下的指令                  //btn=> 等價於function(btn){,btn是參數，代表我們選取的元素
+         btn1.addEventListener('click',()=>{
+                document.querySelectorAll('#weatherSection .options button').forEach(b1=>b1.classList.remove('selected'));       //避免我們按四個，四個都被添加seleted的class,所以每次點擊時都會remove之前的數據
+                btn1.classList.add('selected');                                                      //這個則是添加selected給我們點擊的按鈕
+                localStorage.setItem(`weather_${selectedDate}`,btn1.dataset.weather)  //.dataset是內建的API System,weather則是data-weather中的weather,我也不懂為什麼可以這樣用哈哈哈
+            })
+        });
+
+        document.querySelectorAll('#moodSection .options button').forEach(btn2=>{
+            btn2.addEventListener('click',()=>{
+                document.querySelectorAll('#moodSection .options button').forEach(b2=>b2.classList.remove('selected'));
+                btn2.classList.add('selected')
+                localStorage.setItem(`mood_${selectedDate}`,btn2.dataset.mood);  //儲存選擇的心情
+            })
+        });
+
+        const name=localStorage.getItem("username")||"訪客"            //後面是避免空值的結果
+        document.getElementById("username").textContent=name;         //上面只是提取出來，但是需要這行來把信息代入html
+
+        //載入時回復天氣選擇
+        const savedWeather=localStorage.getItem(`weather_${selectedDate}`);
+        if(savedWeather){
+            document.querySelectorAll('#weatherSection .options button').forEach(btn3=>{         //因為是把全部按鈕都跟savedWeather的選項進行對比，假如一樣就添加selected的weather,這樣才會變色
+                if(btn3.dataset.weather==savedWeather){
+                    btn3.classList.add('selected');
+                }
+            });
+        };
+
+        const savedMood=localStorage.getItem(`mood_${selectedDate}`)
+        if(savedMood){
+            document.querySelectorAll('#moodSection .options button').forEach(btn4=>{
+                if(btn4.dataset.mood==savedMood){
+                    btn4.classList.add('selected');
+                    }
+              });
+            };
+
+        //開銷輸入框的ID與local storage的key對應
+        const expenseGroups=[           //expenseFileds即不是id也不是class，是js的物件（也算變數）
+           {inputClass:'expense_food',totalClass:'.total_food'},     //反正就是自己設的key，懶惰理解了
+           {inputClass:'expense_study',totalClass:'.total_study'},
+           {inputClass:'expense_daily',totalClass:'.total_daily'},
+           {inputClass:'expense_entertainment',totalClass:'.total_entertainment'},
+
+        ];
+
+        function updateAllTotal() {                // 宣告一個名字叫 updateAllTotal 的函式，負責計算「今日總開銷」
+             let total = 0;                         // 準備一個變數 total，放全部分類加總的結果，先從 0 開始
+
+    expenseGroups.forEach(group => {       // 迭代每個開銷分類（你前面定義的陣列：food/study/daily/entertainment）
+        let groupSum = 0;                  // 這一個分類自己的小計，先從 0 開始
+
+        document.querySelectorAll(`.${group.inputClass}`)  // 用 class 抓到這個分類的所有輸入框
+                 .forEach(input => {              // 逐一處理每個輸入框
+              // input.value 是字串，Number(...) 轉成數字；若轉出來是 NaN/空值，用 || 0 當後備值
+              groupSum += Number(input.value) || 0;     //指input裡面的值
+          });
+
+        total += groupSum;                  // 把這個分類的小計，加進總計 total
+    });
+
+    // 把總計顯示到畫面上 id="total_all" 的 <span> 裡
+    document.getElementById("total_all").textContent = total;
+
+        }
+
+        function updateTotal(className,totalSelector){            //className/totalSelector是設置的變數而已
+            let sum=0;
+            document.querySelectorAll(`.${className}`).forEach(input=>{
+                sum+=Number(input.value)  ||0; //有考慮空值的情況
+            });
+            document.querySelector(totalSelector).textContent=`總和:${sum}`;
+        }
+        
+        expenseGroups.forEach(group=>{
+            const inputs =document.querySelectorAll(`.${group.inputClass}`);
+            inputs.forEach((input,index)=>{
+                //載入儲存的值
+                const savedValue=localStorage.getItem(`${group.inputClass}_${index}_${selectedDate}`);
+                if(savedValue !==null){
+                    input.value=savedValue;
+                }
+            //綁定輸入事件
+            input.addEventListener(`input`,()=>{
+                localStorage.setItem(`${group.inputClass}_${index}_${selectedDate}`,input.value);
+                updateTotal(group.inputClass,group.totalClass);
+                updateAllTotal();
+                });
+            });
+                 //初始計算一次總和
+            updateTotal(group.inputClass,group.totalClass);
+            });
+
+            updateAllTotal();
+
+        function saveTodos(){
+            const todos=[];      //建立一個空的矩陣
+            document.querySelectorAll('.todo-item').forEach(item=>{
+                const check=item.querySelector('.todo-check').checked;
+                const text=item.querySelector('.todo-text').value;
+                const time=item.querySelector('.todo-time').value;
+                todos.push({check,text,time});     //push是把東西丟進陣列最後面
+            });
+            localStorage.setItem(`todos_${selectedDate}`,JSON.stringify(todos));           //local.storage只能存字串，這時候要用到JSON.stringify將矩陣轉成字串
+        //JSON:JavaScript Object Notation,主要功能是轉化格式
+        }
+
+        //新增代辦行列
+        const addTodoBtn=document.getElementById('add-todo');
+        addTodoBtn.addEventListener('click',()=>{
+            const todoList=document.getElementById('todo-list');
+
+            //建立新的todo-item
+            const newItem=document.createElement('div');
+            newItem.classList.add('todo-item');
+
+            newItem.innerHTML=`
+                <input type="checkbox" class="todo-check">
+                <input type="text" class="todo-text" placeholder="請輸入代辦事項">
+                <input type="time" class="todo-time">
+            `;         //在這邊``是反引號，可以換行寫多行html,這幾行的功能就是把這些內容加入div中
+
+            //加入到todo-list
+           todoList.appendChild(newItem); 
+
+            //綁定checkbox事件
+            bindTodoEvents(newItem)
+
+        });
+
+    //簡單來說function的表達就是y=f(x),item就是x(參數),y(函式)就是bindTodoEvents
+    function bindTodoEvents(item){          //item是必寫的，目前也不太明白為什麼
+        const check=item.querySelector('.todo-check');
+        const text=item.querySelector('.todo-text');
+        const time=item.querySelector('.todo-time');
+
+        //創建刪除按鈕
+        let deleteBtn=document.createElement('button');
+        deleteBtn.textContent='❌';
+        deleteBtn.style.marginLeft='10px';
+        item.appendChild(deleteBtn);
+
+
+
+        //當checkox改變時
+        check.addEventListener('change',()=>{
+         if(check.checked){                          //.checked是dom api判斷check.checked是不是===true(即打鉤)，if的意思是假如打鉤，沒打鉤屬於else
+                item.classList.add('completed');}
+                else{
+                    item.classList.remove('completed');
+                }
+                saveTodos();
+        });
+
+        text.addEventListener('input',saveTodos);
+        time.addEventListener('input',saveTodos);
+
+
+        //當點擊刪除按鈕時
+        deleteBtn.addEventListener('click',()=>{
+            item.remove();
+            saveTodos();
+        })
+    }
+    
+    // 對每個在.todo-item的元素都執行bindTodoEvents這個function
+    document.querySelectorAll('.todo-item').forEach(item=>bindTodoEvents(item));                //.forEach(function=>(elememt,index,array)),for迴圈是這樣設定的，第一個參數是元素，第二個是元素順序，第三個是陣列
+    //以上這句賦值給item,然後item再作用在bindTodoEvent
+     
+    //載入localStorage
+
+    const todoList=document.getElementById('todo-list');
+
+    //先清空除按鈕之外的todo-item
+    document.querySelectorAll('.todo-item').forEach(item=>item.remove());
+    const savedTodos=localStorage.getItem(`todos_${selectedDate}`);
+    if(savedTodos){
+        const todoArray=JSON.parse(savedTodos);         //JSON.parse是把JSON.stringify儲存的東西轉成原本的格式
+        todoArray.forEach(todo=>{
+            const newItem=document.createElement('div');
+            newItem.classList.add('todo-item');
+            newItem.innerHTML=`
+             <input type="checkbox" class="todo-check" ${todo.check?'checked':''}>
+            <input type="text" class="todo-text"  value="${todo.text}" placeholder="請輸入代辦事項">
+            <input type="time" class="todo-time" value='${todo.time}'>`;
+           
+            if(todo.check){
+                newItem.classList.add('completed');
+            }
+            todoList.appendChild(newItem);
+            bindTodoEvents(newItem); //這個是呼叫function的意思
+        });
+    }else{
+        //如果沒有任何資料，預設建立三個空白行列
+        for(let p=0;p<3;p++){
+            const newItem=document.createElement('div');
+            newItem.classList.add('todo-item');
+            newItem.innerHTML=`
+            <input type="checkbox" class="todo-check">
+            <input type="text" class="todo-text" placeholder="請輸入代辦事項">
+            <input type="time" class="todo-time">`
+        ;
+        todoList.appendChild(newItem);
+        bindTodoEvents(newItem);
+        };
+    }
+    //注意function是可以被呼叫的，但是const定義的函數是不能被呼叫的
+        
+        
+    // 先清空目前的 .todo-item（保險）
+document.querySelectorAll('.todo-item').forEach(item => item.remove());
+
+const raw = localStorage.getItem(`todos_${selectedDate}`);
+let todoArray = [];
+try {                                    //這個function的作用是嘗試運行{}內的程式，如果不能就執行catch的語法
+  todoArray = raw ? JSON.parse(raw) : [];        //parse的意思是解析，JSON.parse則是把儲存的字串解析成原本的格式(如：矩陣等)
+  //上面的意思解析，"?:"的作用是if,else的縮寫如果有值則解析，沒有值則默認為空矩陣
+} catch (e) {           //這個e是指error的意思，不過只是代號，當上面的訊訊息不能運行，電腦則會把錯誤的訊息放進e
+  todoArray = [];
+}
+
+// 如果沒有資料或是空陣列，就先建立 3 行預設欄位
+if (!Array.isArray(todoArray) || todoArray.length === 0) {    //!Array.isArray是一起使用的，這幾個組合起來就是說todoArray不是矩陣的意思              
+  //"||"這個的意思or,後面的todoArray.length===0則是表示說矩陣是空的
+    for (let i = 0; i < 3; i++) {
+    const newItem = document.createElement('div');
+    newItem.classList.add('todo-item');
+    newItem.innerHTML = `
+      <input type="checkbox" class="todo-check">
+      <input type="text" class="todo-text" placeholder="請輸入代辦事項">
+      <input type="time" class="todo-time">
+    `;
+    todoList.appendChild(newItem);
+    bindTodoEvents(newItem);
+  }
+  // 立刻存起來，下次重整也會有三行
+  saveTodos();
+} else {
+  // 有資料就照著渲染x
+  todoArray.forEach(todo => {
+    const newItem = document.createElement('div');
+    newItem.classList.add('todo-item');
+    newItem.innerHTML = `
+      <input type="checkbox" class="todo-check" ${todo.check ? 'checked' : ''}>
+      <input type="text" class="todo-text" value="${todo.text || ''}" placeholder="請輸入代辦事項">
+      <input type="time" class="todo-time" value="${todo.time || ''}">
+    `;
+    if (todo.check) newItem.classList.add('completed');
+    todoList.appendChild(newItem);
+    bindTodoEvents(newItem);
+  });
+}   
+
+
+
+    </script>
+
+<div class="todo-exp" id="todo-exp">
+<h2>心得</h2>
+<label for="name">
+    <strong>今日進步</strong><br>
+</label>
+<span>1.</span><input type="text"  id="exp-up-1"><br>
+<span>2.</span><input type="text"  id="exp-up-2"><br>
+<span>3.</span><input type="text"  id="exp-up-3"><br>
+
+
+<label for="name">
+    <strong>今日反思</strong><br>
+</label>
+<span>1.</span><input type="text"  id="exp-down-1"><br>
+<span>2.</span><input type="text"  id="exp-down-2"><br>
+<span>3.</span><input type="text"  id="exp-down-3"><br>
+
+
+
+</div>
+
+<script>
+document.getElementById('exp-up-1').value=localStorage.getItem('exp-up-1')||'';
+document.getElementById('exp-up-2').value=localStorage.getItem('exp-up-2')||"";
+document.getElementById('exp-up-3').value=localStorage.getItem('exp-up-3')||"";
+
+//設定EventListener
+document.getElementById('exp-up-1').addEventListener('input',function(){
+    localStorage.setItem("exp-up-1", this.value);
+});
+
+document.getElementById('exp-up-2').addEventListener('input',function(){
+    localStorage.setItem('exp-up-2',this.value);
+});
+
+document.getElementById('exp-up-3').addEventListener('input',function(){
+    localStorage.setItem('exp-up-3', this.value);
+});
+
+document.getElementById('exp-down-1').value=localStorage.getItem('exp-down-1')||"";
+document.getElementById('exp-down-2').value=localStorage.getItem('exp-down-2')||"";
+document.getElementById('exp-down-3').value=localStorage.getItem('exp-down-3')||"";
+
+document.getElementById("exp-down-1").addEventListener('input',function(){
+    localStorage.setItem("exp-down-1",this.value);
+});
+document.getElementById("exp-down-2").addEventListener('input',function(){
+    localStorage.setItem("exp-down-2",this.value);
+});
+document.getElementById("exp-down-3").addEventListener('input',function(){
+    localStorage.setItem("exp-down-3",this.value);
+});
+</script>
+</body>
+</html>
