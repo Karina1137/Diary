@@ -87,11 +87,124 @@
         .btn-group button:hover{
             transform: scale(1.05);
             background: linear-gradient(135degg,#ffb6b9,#ff867c);
+        
+        }
+
+        .main-container{
+            display: flex;
+            width:100%;
+            height: 100%;
+        }
+
+        /* 侧边栏设计 */
+        .sidebar{
+            width: 250px;
+            background:rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);  /*磨砂玻璃效果,使得元素背后的内容做模糊处理*/
+            box-shadow:2px 0 10px rgba(0,0,0,0.1);
+            display: flex; /*使得容器中的子元素会自动贴在同一排，容易做置中，靠左等*/
+            flex-direction: column;   /*将flex预设的横着排变成上到下*/
+            padding: 20px 0;
+        }
+    
+        .sidebar-header{
+            padding: 0 20px;
+            color: #ff6f61;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu li{
+            padding: 15px 25px;
+            cursor:pointer;
+            transition: 0.3s;    /*颜色会慢慢变，要搭配hover*/
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .sidebar-menu li:hover{
+            background: #ffede6;
+            color: #ff6f61;
+            padding-left: 35px;    /*padding是控制内容跟边框的距离，配上hover跟transition则可以有一种位移感*/   
+        }
+
+        .sidebar-menu li.active{  /*active是其中一个class*/
+            background:#ff6f61; /*背景颜色*/
+            color: white;       /*文字颜色*/
+        }
+
+        .calender{
+            flex: 1;  /**/
+            margin:auto;
+            background:rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            height:aut0;
+        }
+
+        .menu-toggle{
+            position: fixed;
+            top: 20px;  
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .bar{
+            width: 25px;   /*设定长线长度*/
+            height: 3px;    /*细小宽度*/
+            background-color: #4a3432;
+            border-radius: 2px;
+            transition: 0.3s;     /*暂时还没用到好像*/
+        }
+
+        /*侧边栏的初始状态，隐藏在左边*/
+        .sidebar{
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateX(-250px);    /*往左走移除荧幕(translateX x方向)*/
+            transition: transform 0.3s ease-in-out;
+            z-index:999;
+        }
+
+        /*當側邊欄有"open"這個class時，移回畫面中*/
+        .sidebar.open{
+            transform:translateX(0);
         }
 
     </style>
 </head>
 <body>
+    <div class="main-container">
+        <div class="menu-toggle " id="menu-toggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>功能选单</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li onclick="window.location.href='mainpage.html'">首页</li>   <!--作用是点击后就会跳转页面-->
+                <li class='active'>日曆視圖</li>
+                <li onclick="alert(功能尚未开发完成)">活动记录</li>   <!--alert是跳出一个视窗，然后出现后面的字样(显示在console里面)-->
+                <li onclick="alert(设定功能尚未开发完成)">设定</li>
+               
+            </ul>
+        </div>
+
+
     <div class="calender">
         <div class="btn-group">
             <button id="prev-month">‹ 上一個月</button>
@@ -108,6 +221,7 @@
         <div class="day-header">五</div>  
         <div class="day-header">六</div>   
         </div>   
+        </div>
     </div>
 
     <script>
@@ -175,6 +289,25 @@
 
         // 初始化
         renderCalender(currentYear, currentMonth);           //這個是說一開始進入頁面的時候要先顯示的初始內容
-    </script>
+        
+        const menuToggle=document.getElementById('menu-toggle');
+        const sidebar=document.getElementById('sidebar')
+ 
+        menuToggle.addEventListener('click',()=>{
+            //意思是原本沒有open就加上，如果有就拿到
+            sidebar.classList.toggle('open');    //classList就是class的意思，搭配後面的toggle就可以添加or remove open的id
+            //toggle是dom api ，means切換，當我們click時，檢查有無open,有就remove,沒有就添加
+        });
+
+        //點擊網頁其他地方會自動收起選單
+        document.addEventListener('click',(event)=>{
+        //在document添加addEventListener則是監聽整個網頁
+            if(!sidebar.contains(event.target)&&!menuToggle.contains(event.target)){
+                sidebar.classList.remove("open") 
+            }
+        }
+    );
+
+ </script>
 </body>
 </html>
