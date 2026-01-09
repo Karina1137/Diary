@@ -153,6 +153,23 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            transition:all 0.3s ease-in-out;
+        }
+
+        .cross{
+            position: fixed;
+            top: 20px;  
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition:all 0.3s ease-in-out;
+
+            /*初始狀態為隱藏*/
+            opacity: 0;
+            pointer-events: none;
         }
 
         .bar{
@@ -181,6 +198,30 @@
             transform:translateX(0);
         }
 
+        .day.today{
+            background-color: #ff6f61;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;       /*变成圆一点，看起来更像标记*/
+            box-shadow: 0 4px 10px rgba(255, 111, 97, 0.4);
+        }
+        
+        .jump-group{
+            display: flex;
+            gap: 5px;
+        }
+
+        .jump-group select{
+            padding:5px;
+            border-radius: 8px;
+            border: 1px solid #ff9a9e;
+            color: #ff6f61;
+            font-family: inherit;      /*继承父元素的字体*/
+            cursor: pointer;
+            background: white;
+        }
+    
+
     </style>
 </head>
 <body>
@@ -191,12 +232,16 @@
             <div class="bar"></div>
         </div>
 
+        <div class="cross" id="cross">
+            ❌
+        </div>
+        
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2>功能选单</h2>
             </div>
             <ul class="sidebar-menu">
-                <li onclick="window.location.href='mainpage.html'">首页</li>   <!--作用是点击后就会跳转页面-->
+                <li onclick="window.location.href='index.html'">首页</li>   <!--作用是点击后就会跳转页面-->
                 <li class='active'>日曆視圖</li>
                 <li onclick="alert(功能尚未开发完成)">活动记录</li>   <!--alert是跳出一个视窗，然后出现后面的字样(显示在console里面)-->
                 <li onclick="alert(设定功能尚未开发完成)">设定</li>
@@ -208,6 +253,27 @@
     <div class="calender">
         <div class="btn-group">
             <button id="prev-month">‹ 上一個月</button>
+
+            <div class="jump-group">
+                <select id="jump-year"></select>
+                <select id="jump-month">
+                    <option value="0">1月</option>
+                    <option value="1">2月</option>
+                    <option value="2">3月</option>
+                    <option value="3">4月</option>
+                    <option value="4">5月</option>
+                    <option value="5">6月</option>
+                    <option value="6">7月</option>
+                    <option value="7">8月</option>
+                    <option value="8">9月</option>
+                    <option value="9">10月</option>
+                    <option value="10">11月</option>
+                    <option value="11">12月</option>
+
+                </select>
+
+
+            </div>
             <button id="next-month">下一個月 ›</button>
         </div>
         <div  id='calender-header'class="calender-header">2025年8月</div>
@@ -225,88 +291,271 @@
     </div>
 
     <script>
-        let currentYear = 2025;
-        let currentMonth = 7; // 0-based (7 = 8月)
+    //     let currentYear = 2025;
+    //     let currentMonth = 7; // 0-based (7 = 8月)
 
-        const header = document.getElementById("calender-header");
-        const grid = document.getElementById("calender-grid");
+    //     const header = document.getElementById("calender-header");
+    //     const grid = document.getElementById("calender-grid");
 
-        function renderCalender(year,month) {                    //用function(把這個函式保存在記憶體中，隨時可callout),不能用let           //renderCalender的意思是把日曆渲染(畫)出來
-            //上面的year,month是我們設定的變數，下面會有用currentYear(is defined)，currentMonth(is defined)來賦值
-            // 更新標題
-            header.textContent = `${year}年${month + 1}月`;
+    //     function renderCalender(year,month) {                    //用function(把這個函式保存在記憶體中，隨時可callout),不能用let           //renderCalender的意思是把日曆渲染(畫)出來
+    //         //上面的year,month是我們設定的變數，下面會有用currentYear(is defined)，currentMonth(is defined)來賦值
+    //        const todayDate=now.getDate(); //今天几号
+    //        const todayMonth=now.getMonth(); //今天几月
+    //        const todayYear=now.getFullYear(); //今天几年
 
-            // 清除舊的日期格子（保留星期標題前 7 格）
-            while (grid.children.length > 7) {
-                grid.removeChild(grid.lastChild);
-            }
+    //         // 更新標題
+    //         header.textContent = `${year}年${month + 1}月`;
 
-            // 計算這個月的第一天星期幾
-            const firstDay = new Date(year, month, 1).getDay();
+    //         // 清除舊的日期格子（保留星期標題前 7 格）
+    //         while (grid.children.length > 7) {
+    //             grid.removeChild(grid.lastChild);
+    //         }
 
-            // 計算這個月有幾天
-            const daysInMonth = new Date(year, month + 1, 0).getDate();          //8月0號則代表7月的最後一天
+    //         // 計算這個月的第一天星期幾
+    //         const firstDay = new Date(year, month, 1).getDay();
 
-            // 填空白格子，所以我們日期跟禮拜幾才可以對上，因為這是決定我們到底要空多少格子
-            for (let i = 0; i < firstDay; i++) {     
-                const emptyCell = document.createElement('div');
-                emptyCell.classList.add('empty');
-                grid.appendChild(emptyCell);
-            }
+    //         // 計算這個月有幾天
+    //         const daysInMonth = new Date(year, month + 1, 0).getDate();          //8月0號則代表7月的最後一天
 
-            // 填日期格子
-            for (let day = 1; day <= daysInMonth; day++) {
-                const cell = document.createElement('div');
-                cell.classList.add('day');
-                cell.textContent = day;
-                cell.addEventListener('click', function() {
-                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    localStorage.setItem('selectedDate',dateStr);               //存日期到LocalStorage
-                    window.location.href = `Diary.html`;
-                });
-                grid.appendChild(cell);
-                //原本在script中添加的div是只存在在記憶體中的，他們並沒有放進html的結構中，所以不會出現在瀏覽器內，appendChild的作用就是把這個出生的元素搬進去htmml某個父容器中
-            }
-        }
+    //         // 填空白格子，所以我們日期跟禮拜幾才可以對上，因為這是決定我們到底要空多少格子
+    //         for (let i = 0; i < firstDay; i++) {     
+    //             const emptyCell = document.createElement('div');
+    //             emptyCell.classList.add('empty');
+    //             grid.appendChild(emptyCell);
+    //         }
 
-        document.getElementById('prev-month').addEventListener('click', () => {
-            currentMonth--;                           //點擊prev-month時currentMonth-1
-            if (currentMonth < 0) {                   //額外設定，當currentMonth小過0(即-1)
-                currentMonth = 11;                     //即設定成Month=11(11代表12月)
-                currentYear--;                         //然後年份-1
-            }
-            renderCalender(currentYear, currentMonth);
-        });
+    //         // 填日期格子
+    //         for (let day = 1; day <= daysInMonth; day++) {
+    //             const cell = document.createElement('div');
+    //             cell.classList.add('day');
+    //             cell.textContent = day;
+    //             cell.addEventListener('click', function() {
+    //                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    //                 localStorage.setItem('selectedDate',dateStr);               //存日期到LocalStorage
+    //                 window.location.href = `Diary.html`;
+    //             });
+    //             grid.appendChild(cell);
+    //             //原本在script中添加的div是只存在在記憶體中的，他們並沒有放進html的結構中，所以不會出現在瀏覽器內，appendChild的作用就是把這個出生的元素搬進去htmml某個父容器中
+    //         }
+    //     }
 
-        document.getElementById('next-month').addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {            //即12月
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalender(currentYear, currentMonth);
-        });
+    //     document.getElementById('prev-month').addEventListener('click', () => {
+    //         currentMonth--;                           //點擊prev-month時currentMonth-1
+    //         if (currentMonth < 0) {                   //額外設定，當currentMonth小過0(即-1)
+    //             currentMonth = 11;                     //即設定成Month=11(11代表12月)
+    //             currentYear--;                         //然後年份-1
+    //         }
+    //         renderCalender(currentYear, currentMonth);
+    //     });
 
-        // 初始化
-        renderCalender(currentYear, currentMonth);           //這個是說一開始進入頁面的時候要先顯示的初始內容
+    //     document.getElementById('next-month').addEventListener('click', () => {
+    //         currentMonth++;
+    //         if (currentMonth > 11) {            //即12月
+    //             currentMonth = 0;
+    //             currentYear++;
+    //         }
+    //         renderCalender(currentYear, currentMonth);
+    //     });
+
+    //     //判断这一天是不是今天
+    //     if (day===todayDate &&month === todayMonth &&year ===todayYear){
+    //         cell.classList.add('today');
+    //     }
+
+    //     cell.addEventListener('click', function() {
+    //         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    //         localStorage.setItem('selectedDate', dateStr);
+    //         window.location.href = `Diary.html`;
+    //     });
+    //     grid.appendChild(cell);
+    
+
+
+    //     // 初始化
+    //     renderCalender(currentYear, currentMonth);           //這個是說一開始進入頁面的時候要先顯示的初始內容
         
-        const menuToggle=document.getElementById('menu-toggle');
-        const sidebar=document.getElementById('sidebar')
+    //     const menuToggle=document.getElementById('menu-toggle');
+    //     const sidebar=document.getElementById('sidebar')
+    //     const crosssymbol=document.getElementById('cross')
  
-        menuToggle.addEventListener('click',()=>{
-            //意思是原本沒有open就加上，如果有就拿到
-            sidebar.classList.toggle('open');    //classList就是class的意思，搭配後面的toggle就可以添加or remove open的id
-            //toggle是dom api ，means切換，當我們click時，檢查有無open,有就remove,沒有就添加
-        });
+    //     menuToggle.addEventListener('click',(event)=>{
+    //         //意思是原本沒有open就加上，如果有就拿到
+    //         sidebar.classList.toggle('open');    //classList就是class的意思，搭配後面的toggle就可以添加or remove open的id
+    //         //toggle是dom api ，means切換，當我們click時，檢查有無open,有就remove,沒有就添加
+    //     if(sidebar.classList.contains("open")){
+    //         menuToggle.style.opacity="0";     /*假設sidebar的classs屬性中還包含了open，則使得透明度變成0*/
+    //         menuToggle.style.pointerEvents='none'   /*pointEvent是你滑鼠點擊時的活動。none代表無法點擊*/
+    //         crosssymbol.style.opacity="1";
+    //         crosssymbol.style.pointerEvents='auto'
+    //     }
+    //     event.stopPropagation();   /*字面意思停止傳播*/
+    //     /*簡單講解，html的結構有很多層，最外層叫document,中間是sidebar,最內層是button，當你點擊按鈕時，同時也會觸發別的eventlistener.所以通過stop propagation可以讓指令停在這邊就好*/
+    //     });
 
-        //點擊網頁其他地方會自動收起選單
-        document.addEventListener('click',(event)=>{
-        //在document添加addEventListener則是監聽整個網頁
-            if(!sidebar.contains(event.target)&&!menuToggle.contains(event.target)){
-                sidebar.classList.remove("open") 
-            }
+        
+
+
+    //     //點擊網頁其他地方會自動收起選單
+    //     document.addEventListener('click',(event)=>{  /*event不是dom api而是自己設定的名稱*/
+    //     //event是說當你click的時候，瀏覽器會產生這個物件，會包含這次點擊的細節，
+    //     //在document添加addEventListener則是監聽整個網頁
+    //         if(!sidebar.contains(event.target)&&!menuToggle.contains(event.target)){ /*注意event可以改名稱but target不能改，是內建的名稱*/
+    //         //意思是如果你不是點擊的不是sidebar裡面的部分，也不是按鈕（means空白處）強制收回表單
+    //             sidebar.classList.remove("open") ;
+    //             menuToggle.style.opacity='1';   //恢復點擊
+    //             menuToggle.style.pointerEvents="auto"  ; //恢復點擊
+    //             crosssymbol.style.opacity='0';   //恢復點擊
+    //             crosssymbol.style.pointerEvents="none"  ; //恢復點擊
+    //         }
+    //     }
+    // );
+
+    const realTime=new Date();
+
+    let currentYear = realTime.getFullYear();
+    let currentMonth = realTime.getMonth(); // 建議從 0 開始，比較好測試「今天」
+
+    const header = document.getElementById("calender-header");
+    const grid = document.getElementById("calender-grid");
+
+    function renderCalender(year, month) {
+        // --- 1. 定義現在的時間 ---
+        const now = new Date();
+        const todayDate = now.getDate();
+        const todayMonth = now.getMonth();
+        const todayYear = now.getFullYear();
+
+        header.textContent = `${year}年${month + 1}月`;
+
+        while (grid.children.length > 7) {
+            grid.removeChild(grid.lastChild);
         }
-    );
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('empty');
+            grid.appendChild(emptyCell);
+        }
+
+        // --- 2. 進入日期迴圈 ---
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cell = document.createElement('div');
+            cell.classList.add('day');
+            cell.textContent = day;
+
+            // --- 3. 判斷這一天是不是今天 (必須在迴圈內) ---
+            if (day === todayDate && month === todayMonth && year === todayYear) {
+                cell.classList.add('today');
+            }
+
+            cell.addEventListener('click', function() {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                localStorage.setItem('selectedDate', dateStr);
+                window.location.href = `Diary.html`;
+            });
+            grid.appendChild(cell);
+        }
+    }
+
+    // 按鈕監聽
+    document.getElementById('prev-month').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalender(currentYear, currentMonth);
+        syncJumpMenus();
+        
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalender(currentYear, currentMonth);
+        syncJumpMenus();
+    });
+
+    // 初始化日曆
+    renderCalender(currentYear, currentMonth);
+
+    // --- 側邊欄與叉叉邏輯 ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const crosssymbol = document.getElementById('cross');
+
+    menuToggle.addEventListener('click', (event) => {
+        sidebar.classList.add('open');
+        menuToggle.style.opacity = "0";
+        menuToggle.style.pointerEvents = 'none';
+        crosssymbol.style.opacity = "1";
+        crosssymbol.style.pointerEvents = 'auto';
+        event.stopPropagation();
+    });
+
+    // 點擊網頁其他地方自動收起
+    document.addEventListener('click', (event) => {
+        if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+            sidebar.classList.remove("open");
+            menuToggle.style.opacity = '1';
+            menuToggle.style.pointerEvents = "auto";
+            crosssymbol.style.opacity = '0';
+            crosssymbol.style.pointerEvents = "none";
+        }
+    });
+
+    // 也可以幫 crosssymbol 加上點擊事件 (可選)
+    crosssymbol.addEventListener('click', () => {
+        sidebar.classList.remove("open");
+        menuToggle.style.opacity = '1';
+        menuToggle.style.pointerEvents = "auto";
+        crosssymbol.style.opacity = '0';
+        crosssymbol.style.pointerEvents = "none";
+    });
+
+    const jumpYear=document.getElementById('jump-year');
+    const jumpMonth=document.getElementById('jump-month');
+    
+    //初始化年份选择单（从2020到2035）
+    function initJumpMenus(){
+        const startYear=2020;
+        const endYear=2035;
+
+        for(let i =startYear; i<=endYear;i++){
+            const option=document.createElement('option')
+            option.value=i;
+            option.textContent=i+'年';
+            jumpYear.appendChild(option);
+        }
+        jumpYear.value  =currentYear;
+        jumpMonth.value=currentMonth;
+    }
+
+        //监听年份与月份的变化
+        function handleJump(){
+            currentYear=parseInt(jumpYear.value);   //读取选单现在选的年份
+            currentMonth=parseInt(jumpMonth.value);  //读取选单现在的月份
+            renderCalender(currentYear,currentMonth);  //重新画一次日历
+        }
+        
+        jumpYear.addEventListener('change',handleJump);      //当发现option变的时候，就要重新生成日历，是每次都刷新一次日历
+        jumpMonth.addEventListener('change',handleJump);
+
+        //点击上下月的按钮的时候，选单也会同步更新
+        function syncJumpMenus(){        //这是避免假设按下一个月button的时候，option没跟着变，所以设定一个function然后callout他
+            jumpYear.value=currentYear;
+            jumpMonth.value=currentMonth;
+        }
+
+        initJumpMenus();
+        
+        //save current year 
 
  </script>
 </body>

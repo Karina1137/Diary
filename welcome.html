@@ -91,14 +91,20 @@
         const user=params.get('user') || "訪客";
         document.getElementById("welcomeMsg").textContent=`歡迎光臨,${user}!`;
 
+        function goToMainPage(){
+            window.location.href='mainpage.html'
+        }
 
         //監聽整個畫面的點擊事件
-        document.body.addEventListener('click',function(){
-            window.location.href='mainpage.html'     //作用是切換成下一頁網址
-
-            
+        document.body.addEventListener('click',goToMainPage);
+    
+        document.addEventListener('keydown',function(event){   //keydown 意思应该是按下了什么键
+        //判断按下的按键是否为空白键，通常是用""或'space'表示
+        if (event.key===" "||event.key==='Space'||event.key==='Enter  '){
+            event.preventDefault();    //避免按空白键时网页滚动
+            goToMainPage();
+        }
         })
-
 
           const translations={
         CN:{
